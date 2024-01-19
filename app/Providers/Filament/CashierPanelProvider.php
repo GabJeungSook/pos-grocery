@@ -26,6 +26,7 @@ class CashierPanelProvider extends PanelProvider
             ->id('cashier')
             ->path('')
             ->login()
+            ->brandName('POS Grocery')
             ->colors([
                 'primary' => Color::Amber,
             ])
