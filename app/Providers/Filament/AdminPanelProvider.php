@@ -50,11 +50,11 @@ class AdminPanelProvider extends PanelProvider
                 SalesChart::class,
             ])
             ->navigationItems([
-                NavigationItem::make('Stock In')
-                    // ->url(fn (): string => StockIn::getUrl())
-                    ->icon('heroicon-o-archive-box-arrow-down')
-                    ->group('Manage Inventory')
-                    ->sort(3),
+                // NavigationItem::make('Stock In')
+                //     // ->url(fn (): string => StockIn::getUrl())
+                //     ->icon('heroicon-o-archive-box-arrow-down')
+                //     ->group('Manage Inventory')
+                //     ->sort(3),
 
             ])
             ->middleware([

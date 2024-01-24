@@ -11,6 +11,7 @@ class CreateProduct extends CreateRecord
     protected static string $resource = ProductResource::class;
     protected static ?string $title = 'Add Product';
 
+
     protected function getFormActions(): array
     {
         return [
