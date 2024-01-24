@@ -2,24 +2,29 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
+use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\Filament\Widgets\SalesChart;
+use App\Filament\Widgets\ProductChart;
+use Filament\Navigation\NavigationItem;
+use App\Filament\Widgets\CashierOverview;
+use Filament\Http\Middleware\Authenticate;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AdminPanelProvider extends PanelProvider
 {
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -39,8 +44,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                CashierOverview::class,
+                ProductChart::class,
+                SalesChart::class,
+            ])
+            ->navigationItems([
+                NavigationItem::make('Stock In')
+                    // ->url(fn (): string => StockIn::getUrl())
+                    ->icon('heroicon-o-archive-box-arrow-down')
+                    ->group('Manage Inventory')
+                    ->sort(3),
+
             ])
             ->middleware([
                 EncryptCookies::class,
