@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
+use Filament\Support\Enums\FontFamily;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -24,12 +27,32 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\BelongsToSelect::make('category_id')
+                Grid::make(1)
+                ->schema([
+                    Forms\Components\TextInput::make('barcode')
+                    ->required()
+                    ->autofocus()
+                    ->numeric()
+                    ->maxLength(255),
+                ]),
+
+                Forms\Components\Select::make('category_id')
                     ->relationship('category', 'name')
                     ->required(),
+                Forms\Components\TextInput::make('reorder_point')
+                    ->label('Reorder Point')
+                    ->hint('The minimum quantity of this product that should be in stock.')
+                    ->required()
+                    ->numeric(),
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->autocapitalize('words')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('price')
+                    ->prefix('₱')
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
+                    ->required(),
             ]);
     }
 
@@ -41,21 +64,25 @@ class ProductResource extends Resource
                     ->badge()
                     ->color('success')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('barcode')
+                    ->fontFamily(FontFamily::Mono)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->badge()
+                    ->color('warning')
+                    ->formatStateUsing(fn ($record) => '₱ '.number_format($record->price, 2)),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                ->button()
-                ->color('warning')
-                ->icon('heroicon-o-pencil'),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

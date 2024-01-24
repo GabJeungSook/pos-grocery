@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id');
+            $table->string('barcode')->unique();
             $table->string('name');
+            $table->decimal('price', 10, 2);
+            $table->integer('reorder_point');
             $table->timestamps();
         });
     }
