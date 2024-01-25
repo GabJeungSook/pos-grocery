@@ -54,13 +54,13 @@
             </div>
         </div>
     </div>
-    <div style="display: flex;  justify-content: end; margin-top: 5rem">
+    {{-- <div style="display: flex;  justify-content: end; margin-top: 5rem">
         <div style="margin-right: 0.5rem; align-items: center; ">
             <x-filament::button type="submit" style=" padding-left: 1rem; padding-right: 1rem;" size="md" wire:click="saveTransaction">Pay</x-filament::button>
         </div>
         <div style="display: flex; align-items: center;">
             <button type="button" class="self-end rounded-md bg-white mt-10 px-2.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-600 hover:bg-gray-50">Cancel</button>
         </div>
-    </div>
+    </div> --}}
     </div>
 </x-filament-panels::page>

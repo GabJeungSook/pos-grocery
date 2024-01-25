@@ -81,6 +81,8 @@ class StockIn extends Page
         $inventory = Inventory::create([
             'product_id' => $this->data['product_id'],
             'quantity' => $this->data['quantity'],
+            'date' => $this->data['date'],
+            'time' => $this->data['time'],
         ]);
 
         Notification::make()
