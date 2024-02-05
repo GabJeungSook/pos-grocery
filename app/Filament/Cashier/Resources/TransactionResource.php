@@ -52,6 +52,7 @@ class TransactionResource extends Resource
     {
         return [
             'index' => Pages\PointOfSale::route('/'),
+            'receipt' => Pages\Receipt::route('/{record}/receipt'),
         ];
     }
 }

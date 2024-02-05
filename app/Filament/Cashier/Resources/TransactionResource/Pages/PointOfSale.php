@@ -26,6 +26,7 @@ class PointOfSale extends Page
     public $scanned_products = [];
     public $quantity = 1;
     public $total_quantity = 0;
+    public $sub_total = 0;
     public $grand_total = 0;
     public $tax;
     public $total_tax;
@@ -51,12 +52,12 @@ class PointOfSale extends Page
                     ->required(),
             ])->disabled(fn () => $this->scanned_products === [])
             ->requiresConfirmation()
-            ->action(function (array $data): void {
+            ->action(function (array $data) {
                 DB::beginTransaction();
                 $transaction = Transaction::create([
                     'transaction_number' => 'TRN-'.date('YmdHis'),
                     'quantity' => $this->total_quantity,
-                    'sub_total' => $this->grand_total,
+                    'sub_total' => $this->sub_total,
                     'tax' => $this->total_tax,
                     'discount' => $this->total_discount,
                     'discount_type' => $this->discount_name,
@@ -90,6 +91,7 @@ class PointOfSale extends Page
                 $this->total_quantity = 0;
                 $this->grand_total = 0;
                 $this->scan_barcode = null;
+                return redirect()->route('filament.cashier.resources.transactions.receipt', $transaction);
 
             }),
             Action::make('addDiscount')
@@ -143,6 +145,7 @@ class PointOfSale extends Page
                $tax = array_sum(array_column($this->scanned_products, 'tax'));
                $this->total_tax = $tax;
                $total = $subtotal + $tax;
+               $this->sub_total = $subtotal;
                $this->total_discount = $total * ($this->discount_percentage / 100);
                $this->grand_total = $total - $this->total_discount;
 
@@ -188,6 +191,7 @@ class PointOfSale extends Page
                  $tax = array_sum(array_column($this->scanned_products, 'tax'));
                  $this->total_tax = $tax;
                  $total = $subtotal + $tax;
+                 $this->sub_total = $subtotal;
                  $this->total_discount = $total * ($this->discount_percentage / 100);
                  $this->grand_total = $total - $this->total_discount;
                 //  $this->grand_total += $product->price + ($product->price * ($this->tax->percentage / 100)) - $this->total_discount;
@@ -209,6 +213,7 @@ class PointOfSale extends Page
                 $tax = array_sum(array_column($this->scanned_products, 'tax'));
                 $this->total_tax = $tax;
                 $total = $subtotal + $tax;
+                $this->sub_total = $subtotal;
                 $this->total_discount = $total * ($this->discount_percentage / 100);
                 $this->grand_total = $total - $this->total_discount;
                 // $this->total_discount = $this->grand_total * ($this->discount_percentage / 100);

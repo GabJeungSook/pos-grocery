@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
 
 class ViewTransactionResource extends Resource
 {
@@ -46,13 +47,20 @@ class ViewTransactionResource extends Resource
                 ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                 ->label('Date of Transaction')
-                ->dateTime()
+                ->dateTime('F d, Y h:i A')
                 ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('view_receipt')
+                ->label('View Receipt')
+                ->url(fn (Transaction $record): string => route('filament.cashier.resources.transactions.receipt', $record))
+                ->button()
+                ->icon('heroicon-o-eye')
+                ->openUrlInNewTab()
+
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
