@@ -39,15 +39,15 @@
         </div>
         <div class="flex justify-end">
             <div class="mt-4" style="margin-top: 5rem; width: 280px;">
-                <p class="font-mono flex justify-between"><span class="font-bold">Sub-total: ₱ </span> <span>{{number_format($transaction->sub_total, 2)}}</span></p>
-                <p class="font-mono flex justify-between"><span class="font-bold">Tax: ₱ </span> <span> {{number_format($transaction->tax, 2)}}</span></p>
-                <p class="font-mono flex justify-between"><span class="font-bold">Discount: ₱
+                <p class="font-mono flex justify-between"><span class="font-bold">Sub-total: &nbsp; ₱ </span> <span>{{number_format($transaction->sub_total, 2)}}</span></p>
+                <p class="font-mono flex justify-between"><span class="font-bold">Tax: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ₱ </span> <span> {{number_format($transaction->tax, 2)}}</span></p>
+                <p class="font-mono flex justify-between"><span class="font-bold">Discount: &nbsp;&nbsp;&nbsp;₱
                 </span> <span> {{number_format($transaction->discount, 2)}}</span></p>
                 <hr class="border-t my-2" style="border-style: dotted; border-color: black">
                 <p class="font-mono flex justify-between"><span class="font-bold">Grand Total: ₱ </span> <span> {{number_format($transaction->grand_total, 2)}}</span></p>
                 <p class="font-mono flex justify-between"><span class="font-bold">Amount Paid: ₱ </span> <span> {{number_format($transaction->amount_paid, 2)}}</span></p>
                 <hr class="border-t my-2" style="border-style: dotted; border-color: black">
-                <p class="font-mono flex justify-between"><span class="font-bold">Change: ₱ </span> <span> {{number_format($transaction->change, 2)}}</span></p>
+                <p class="font-mono flex justify-between"><span class="font-bold">Change: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;₱ </span> <span> {{number_format($transaction->change, 2)}}</span></p>
             </div>
         </div>
 
