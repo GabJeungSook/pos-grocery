@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     <div class="max-w-full">
         <div class="flex justify-between">
-            <span class="text-md font-normal">Rows that are <span class="font-semibold underline" style="color:#d10303;">RED</span> need to be restocked.</span>
+            <span class="text-md font-normal">Rows that are <span class="font-semibold underline" style="color:#d10303;">RED</span> needs to be restocked.</span>
             <div>
                 <label for="search" class="text-sm text-gray-600 block mb-1" style="color: gray">Search:</label>
                 <input type="text" id="search" class="shadow-md rounded-sm px-2 py-1 border border-gray-300 focus:outline-none focus:ring-none" wire:model.live="search" style="outline: none; border-color: gray;" autofocus>

@@ -2,12 +2,17 @@
 
 namespace App\Filament\Cashier\Resources\TransactionResource\Pages;
 
+use App\Models\Tax;
 use App\Models\Product;
+use Filament\Forms\Get;
+use App\Models\Discount;
 use App\Models\Transaction;
 use Filament\Support\RawJs;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\DB;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use App\Filament\Cashier\Resources\TransactionResource;
@@ -22,6 +27,12 @@ class PointOfSale extends Page
     public $quantity = 1;
     public $total_quantity = 0;
     public $grand_total = 0;
+    public $tax;
+    public $total_tax;
+    public $total_discount;
+    public $selected_discount;
+    public $discount_name;
+    public $discount_percentage;
 
     protected function getHeaderActions(): array
     {
@@ -46,8 +57,9 @@ class PointOfSale extends Page
                     'transaction_number' => 'TRN-'.date('YmdHis'),
                     'quantity' => $this->total_quantity,
                     'sub_total' => $this->grand_total,
-                    'tax' => 0,
-                    'discount' => 0,
+                    'tax' => $this->total_tax,
+                    'discount' => $this->total_discount,
+                    'discount_type' => $this->discount_name,
                     'grand_total' => $this->grand_total,
                     'amount_paid' => $data['payment_amount'],
                     'change' => $data['payment_amount'] - $this->grand_total,
@@ -80,6 +92,66 @@ class PointOfSale extends Page
                 $this->scan_barcode = null;
 
             }),
+            Action::make('addDiscount')
+            ->label('Add Discount')
+            ->form([
+                Select::make('discount')
+                ->options(Discount::all()->pluck('name', 'id'))
+                ->required()
+                ->live()
+                ->afterStateUpdated(function ($get, $set) {
+                    $discount = Discount::find($get('discount'));
+                    $set('percentage', $discount->percentage);
+                })
+                ->visible(fn ($get) => $get('is_custom') === false),
+                Toggle::make('is_custom')
+                ->label('Custom Discount')
+                ->onIcon('heroicon-o-check')
+                ->offIcon('heroicon-o-x-mark')
+                ->onColor('success')
+                ->offColor('danger')
+                ->live()
+                ->afterStateUpdated(function ($get, $set) {
+                    if ($get('is_custom') === true) {
+                        $set('discount', null);
+                        $set('percentage', 0);
+                    }
+                }),
+                TextInput::make('percentage')
+                ->label('Percentage')
+                ->numeric()
+                ->prefix('%')
+                ->required()
+                ->default(0)
+                ->readOnly(fn ($get) => $get('is_custom') === false),
+            ])
+            ->disabled(fn () => $this->scanned_products === [])
+            ->requiresConfirmation()
+            ->action(function (array $data) {
+               if($data['is_custom'] != true)
+               {
+                $this->selected_discount = Discount::find($data['discount']);
+                $this->discount_name = $this->selected_discount->name;
+                $this->discount_percentage = $this->selected_discount->percentage;
+               }else{
+                $this->discount_name = 'Custom';
+                $this->discount_percentage = $data['percentage'];
+               }
+               //sum of scanned_products subtotal
+
+               $subtotal = array_sum(array_column($this->scanned_products, 'subtotal'));
+               $tax = array_sum(array_column($this->scanned_products, 'tax'));
+               $this->total_tax = $tax;
+               $total = $subtotal + $tax;
+               $this->total_discount = $total * ($this->discount_percentage / 100);
+               $this->grand_total = $total - $this->total_discount;
+
+                Notification::make()
+                ->title('Discount added')
+                ->body('The discount has been successfully added to the transaction.')
+                ->success()
+                ->send();
+            }),
             Action::make('cancel')
             ->label('Cancel')
             ->color('danger')
@@ -102,6 +174,7 @@ class PointOfSale extends Page
                 $existingProduct['quantity'] += 1;
                 $existingProduct['subtotal'] += $product->price;
                 $this->total_quantity += 1;
+                $existingProduct['tax'] += ($product->price * ($this->tax->percentage / 100));
                 // $this->quantity = $existingProduct['quantity'];
 
                 $this->scanned_products = array_map(function ($product) use ($existingProduct) {
@@ -111,7 +184,15 @@ class PointOfSale extends Page
 
                     return $product;
                 }, $this->scanned_products);
-                $this->grand_total += $product->price;
+                 $subtotal = array_sum(array_column($this->scanned_products, 'subtotal'));
+                 $tax = array_sum(array_column($this->scanned_products, 'tax'));
+                 $this->total_tax = $tax;
+                 $total = $subtotal + $tax;
+                 $this->total_discount = $total * ($this->discount_percentage / 100);
+                 $this->grand_total = $total - $this->total_discount;
+                //  $this->grand_total += $product->price + ($product->price * ($this->tax->percentage / 100)) - $this->total_discount;
+
+                // $this->grand_total += $product->price;
             } else {
                 // If the product is not in the list, add it with quantity 1
                 $newProduct = [
@@ -121,9 +202,18 @@ class PointOfSale extends Page
                     'quantity' => 1,
                     'price' => $product->price,
                     'subtotal' => $product->price,
+                    'tax' => ($product->price * ($this->tax->percentage / 100))
                 ];
                 $this->scanned_products[] = $newProduct;
-                $this->grand_total += $product->price;
+                $subtotal = array_sum(array_column($this->scanned_products, 'subtotal'));
+                $tax = array_sum(array_column($this->scanned_products, 'tax'));
+                $this->total_tax = $tax;
+                $total = $subtotal + $tax;
+                $this->total_discount = $total * ($this->discount_percentage / 100);
+                $this->grand_total = $total - $this->total_discount;
+                // $this->total_discount = $this->grand_total * ($this->discount_percentage / 100);
+                // $this->grand_total += $product->price + ($product->price * ($this->tax->percentage / 100)) - $this->total_discount;
+                // $this->grand_total += $product->price;
                 $this->total_quantity += 1;
             }
 
@@ -152,6 +242,11 @@ class PointOfSale extends Page
         }
 
         return null;
+    }
+
+    public function mount()
+    {
+        $this->tax = Tax::first();
     }
 
     protected static string $view = 'filament.cashier.resources.transaction-resource.pages.point-of-sale';

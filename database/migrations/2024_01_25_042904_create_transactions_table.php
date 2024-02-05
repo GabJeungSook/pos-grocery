@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('sub_total', 8, 2);
             $table->decimal('tax', 8, 2)->nullable();
             $table->decimal('discount', 8, 2)->nullable();
+            $table->string('discount_type')->nullable();
             $table->decimal('grand_total', 8, 2);
             $table->decimal('amount_paid', 8, 2)->nullable();
             $table->decimal('change', 8, 2)->nullable();

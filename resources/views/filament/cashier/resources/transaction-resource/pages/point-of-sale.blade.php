@@ -44,13 +44,13 @@
                 <strong>Sub Total: ₱ {{ number_format(array_sum(array_column($scanned_products, 'subtotal')), 2) }}</strong>
             </div>
             <div>
-                <strong>Tax: % 0</strong>
+                <strong>Tax ({{$tax->name}} % {{$tax->percentage}}): ₱ {{number_format(array_sum(array_column($scanned_products, 'tax')), 2)}} </strong>
             </div>
             <div>
-                <strong>Discount: % 0</strong>
+                <strong>Discount ({{$discount_name}} % {{number_format($discount_percentage, 2)}}): ₱ {{number_format($total_discount, 2)}}</strong>
             </div>
             <div>
-                <strong class="text-3xl">Grand Total: ₱ {{ number_format(array_sum(array_column($scanned_products, 'subtotal')), 2) }}</strong>
+                <strong class="text-3xl">Grand Total: ₱ {{ number_format($grand_total, 2) }}</strong>
             </div>
         </div>
     </div>
