@@ -3,6 +3,10 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
+use Carbon\Carbon;
+use Flowframe\Trend\Trend;
+use App\Models\Transaction;
+use Flowframe\Trend\TrendValue;
 
 class SalesChart extends ChartWidget
 {
@@ -10,15 +14,23 @@ class SalesChart extends ChartWidget
 
     protected function getData(): array
     {
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Sales',
-                    'data' => [0, 10, 5, 2, 21, 32, 45, 74, 65, 45, 77, 89],
-                ],
+        $data = Trend::model(Transaction::class)
+        ->between(
+            start: now()->startOfYear(),
+            end: now()->endOfYear(),
+        )
+        ->perMonth()
+        ->sum('amount_paid');
+
+    return [
+        'datasets' => [
+            [
+                'label' => 'Sales Per Month',
+                'data' => $data->map(fn ($item) => $item->aggregate),
             ],
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        ];
+        ],
+        'labels' => $data->map(fn (TrendValue $value) => Carbon::parse($value->date)->format('M')),
+    ];
     }
 
     protected function getType(): string

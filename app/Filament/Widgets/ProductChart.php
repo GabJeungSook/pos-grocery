@@ -2,7 +2,16 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Product;
+use Carbon\Carbon;
+use Flowframe\Trend\Trend;
+use App\Models\Transaction;
+use App\Models\TransactionItem;
+
+use Flowframe\Trend\TrendValue;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductChart extends ChartWidget
 {
@@ -10,19 +19,43 @@ class ProductChart extends ChartWidget
 
     protected function getData(): array
     {
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Products',
-                    'data' => [0, 10, 5, 2, 21, 32, 45, 74, 65, 45, 77, 89],
-                ],
-            ],
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        $products = Product::with('inventories')->get();
+        $datasets = [];
+        $allLabels = [];
+
+        foreach ($products as $product) {
+            $data = TransactionItem::where('product_id', $product->id)
+                ->whereBetween('created_at', [
+                    now()->startOfYear(),
+                    now()->endOfYear(),
+                ])
+                ->selectRaw('DATE_FORMAT(created_at, "%b") as month, SUM(quantity) as total_quantity')
+                ->groupBy('month')
+                ->get();
+
+            $datasets[] = [
+                'label' => $product->name,
+                'data' => $data->pluck('total_quantity')->toArray(),
+            ];
+
+            $productLabels = $data->pluck('month')->toArray();
+            $allLabels[] = $productLabels; // Store labels for each product
+        }
+
+        // Flatten and get unique labels
+        $commonLabels = array_unique(array_merge(...$allLabels));
+
+        $result = [
+            'datasets' => $datasets,
+            'labels' => $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
         ];
+
+        return $result;
+
     }
 
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 }
