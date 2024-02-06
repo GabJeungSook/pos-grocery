@@ -30,6 +30,7 @@ class DiscountResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('percentage')
                     ->required()
+                    ->prefix('%')
                     ->numeric(),
             ]);
     }

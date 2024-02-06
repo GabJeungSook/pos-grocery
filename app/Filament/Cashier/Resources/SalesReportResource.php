@@ -2,8 +2,8 @@
 
 namespace App\Filament\Cashier\Resources;
 
-use App\Filament\Cashier\Resources\TransactionResource\Pages;
-use App\Filament\Cashier\Resources\TransactionResource\RelationManagers;
+use App\Filament\Cashier\Resources\SalesReportResource\Pages;
+use App\Filament\Cashier\Resources\SalesReportResource\RelationManagers;
 use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,13 +13,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TransactionResource extends Resource
+class SalesReportResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    protected static ?string $navigationLabel = 'Point of Sale';
-
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static ?string $navigationGroup = 'Reports';
+    protected static ?string $navigationLabel = 'Sales Report';
+    protected static ?string $modelLabel = 'salesReport';
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -52,8 +54,7 @@ class TransactionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\PointOfSale::route('/'),
-            'receipt' => Pages\Receipt::route('/{record}/receipt'),
+            'index' => Pages\SalesReport::route('/'),
         ];
     }
 }

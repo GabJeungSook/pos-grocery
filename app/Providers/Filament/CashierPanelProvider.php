@@ -28,6 +28,7 @@ class CashierPanelProvider extends PanelProvider
             ->login()
             ->brandName('POS Grocery')
             ->darkMode(false)
+            ->breadcrumbs(false)
             ->colors([
                 'primary' => Color::Indigo,
                 'gray' => Color::Blue,

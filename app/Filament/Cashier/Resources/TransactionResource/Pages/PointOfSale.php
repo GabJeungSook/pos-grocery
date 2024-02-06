@@ -93,7 +93,7 @@ class PointOfSale extends Page
                 $this->scan_barcode = null;
                 return redirect()->route('filament.cashier.resources.transactions.receipt', $transaction);
 
-            }),
+            })->slideOver(),
             Action::make('addDiscount')
             ->label('Add Discount')
             ->form([
@@ -127,7 +127,7 @@ class PointOfSale extends Page
                 ->default(0)
                 ->readOnly(fn ($get) => $get('is_custom') === false),
             ])
-            ->disabled(fn () => $this->scanned_products === [])
+            ->disabled(fn () => $this->scanned_products === [] || Discount::count() === 0)
             ->requiresConfirmation()
             ->action(function (array $data) {
                if($data['is_custom'] != true)
@@ -158,7 +158,11 @@ class PointOfSale extends Page
             Action::make('cancel')
             ->label('Cancel')
             ->color('danger')
-            ->action(fn () => $this->reset()),
+            ->action(function  () {
+                $this->reset();
+                $this->scan_barcode = null;
+                $this->tax = Tax::first();
+            }),
 
 
         ];
@@ -167,7 +171,7 @@ class PointOfSale extends Page
     public function updatedScanBarcode()
     {
         $product = Product::where('barcode', $this->scan_barcode)->first();
-
+        $this->tax = Tax::first();
         if ($product) {
             // Check if the product is already in the list
             $existingProduct = $this->findProductInList($product->id);

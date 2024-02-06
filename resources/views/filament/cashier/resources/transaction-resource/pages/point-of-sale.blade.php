@@ -44,9 +44,11 @@
                 <strong>Sub Total: ₱ {{ number_format(array_sum(array_column($scanned_products, 'subtotal')), 2) }}</strong>
             </div>
             <div>
+                @if($tax)
                 <strong>Tax ({{$tax->name}} % {{$tax->percentage}}): ₱ {{number_format(array_sum(array_column($scanned_products, 'tax')), 2)}} </strong>
+                @endif
             </div>
-            <div>
+            <div style="color: red">
                 <strong>Discount ({{$discount_name}} % {{number_format($discount_percentage, 2)}}): ₱ {{number_format($total_discount, 2)}}</strong>
             </div>
             <div>
