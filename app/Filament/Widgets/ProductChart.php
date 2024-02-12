@@ -33,24 +33,31 @@ class ProductChart extends ChartWidget
                 ->groupBy('month')
                 ->get();
 
-            $datasets[] = [
-                'label' => $product->name,
-                'data' => $data->pluck('total_quantity')->toArray(),
-            ];
+            if ($data->isNotEmpty()) { // Check if data exists
+                $datasets[] = [
+                    'label' => $product->name,
+                    'data' => $data->pluck('total_quantity')->toArray(),
+                ];
 
-            $productLabels = $data->pluck('month')->toArray();
-            $allLabels[] = $productLabels; // Store labels for each product
+                $productLabels = $data->pluck('month')->toArray();
+                $allLabels[] = $productLabels; // Store labels for each product
+            }
         }
 
         // Flatten and get unique labels
         $commonLabels = array_unique(array_merge(...$allLabels));
 
-        $result = [
-            'datasets' => $datasets === null ? '' : $datasets,
-            'labels' => $data === null ? '' : $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
-        ];
+        if (!empty($datasets)) { // Check if datasets are not empty
+            $result = [
+                'datasets' => $datasets,
+                'labels' => $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
+            ];
+        } else {
+            $result = [];
+        }
 
         return $result;
+
 
     }
 
