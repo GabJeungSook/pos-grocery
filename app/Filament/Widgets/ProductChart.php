@@ -47,7 +47,7 @@ class ProductChart extends ChartWidget
 
         $result = [
             'datasets' => $datasets,
-            'labels' => $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
+            'labels' => $data === null ? '' : $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
         ];
 
         return $result;
