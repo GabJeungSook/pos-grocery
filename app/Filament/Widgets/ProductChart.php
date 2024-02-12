@@ -46,7 +46,7 @@ class ProductChart extends ChartWidget
         $commonLabels = array_unique(array_merge(...$allLabels));
 
         $result = [
-            'datasets' => $datasets,
+            'datasets' => $datasets === null ? '' : $datasets,
             'labels' => $data === null ? '' : $data->map(fn ($value) => Carbon::parse($value->date)->format('M')),
         ];
 
