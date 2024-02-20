@@ -15,7 +15,6 @@ class SalesReport extends Page
 
     public function mount(): void
     {
-
         $this->record = Transaction::whereDate('created_at', now())->get();
         static::authorizeResourceAccess();
     }

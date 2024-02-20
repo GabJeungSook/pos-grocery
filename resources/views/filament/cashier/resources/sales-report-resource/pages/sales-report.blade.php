@@ -1,6 +1,5 @@
 <x-filament-panels::page>
     <div>
-
     <div class="flex justify-between">
         <div  class="flex">
             <div class="px-1">
@@ -61,7 +60,7 @@
 
                 </div>
                 @endif
-            </div>
+            {{-- </div> --}}
 
 
     </div>
