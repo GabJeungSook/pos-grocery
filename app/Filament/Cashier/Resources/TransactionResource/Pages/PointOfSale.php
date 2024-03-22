@@ -3,6 +3,7 @@
 namespace App\Filament\Cashier\Resources\TransactionResource\Pages;
 
 use App\Models\Tax;
+use App\Models\User;
 use App\Models\Product;
 use Filament\Forms\Get;
 use App\Models\Discount;
@@ -251,6 +252,68 @@ class PointOfSale extends Page
         }
 
         return null;
+    }
+
+
+    public function updateQuantityAction(): Action
+    {
+        return Action::make('updateQuantity')
+            ->icon('heroicon-m-pencil-square')
+            ->iconButton()
+            ->requiresConfirmation()
+            ->form([
+                TextInput::make('quantity')
+                ->required()
+                ->numeric()
+                ->minValue(1)
+                ->maxValue(100)
+            ])
+            ->action(function (array $arguments, array $data) {
+                $product = $this->findProductInList($arguments['id']);
+                $product['quantity'] = $data['quantity'];
+                $product['subtotal'] = $product['price'] * $product['quantity'];
+                $product['tax'] = ($product['price'] * ($this->tax->percentage / 100)) * $product['quantity'];
+
+                $this->scanned_products = array_map(function ($item) use ($product) {
+                    if ($item['id'] === $product['id']) {
+                        return $product;
+                    }
+
+                    return $item;
+                }, $this->scanned_products);
+
+                $subtotal = array_sum(array_column($this->scanned_products, 'subtotal'));
+                $tax = array_sum(array_column($this->scanned_products, 'tax'));
+                $this->total_tax = $tax;
+                $total = $subtotal + $tax;
+                $this->sub_total = $subtotal;
+                $this->total_discount = $total * ($this->discount_percentage / 100);
+                $this->grand_total = $total - $this->total_discount;
+
+            });
+    }
+
+    public function deleteRowAction(): Action
+    {
+        return Action::make('deleteRow')
+        ->icon('heroicon-o-x-mark')
+        ->color('danger')
+        ->iconButton()
+        ->action(function (array $arguments) {
+            $product = $this->findProductInList($arguments['id']);
+            $this->total_quantity -= $product['quantity'];
+            $this->scanned_products = array_filter($this->scanned_products, function ($item) use ($arguments) {
+                return $item['id'] !== $arguments['id'];
+            });
+
+            $subtotal = array_sum(array_column($this->scanned_products, 'subtotal'));
+            $tax = array_sum(array_column($this->scanned_products, 'tax'));
+            $this->total_tax = $tax;
+            $total = $subtotal + $tax;
+            $this->sub_total = $subtotal;
+            $this->total_discount = $total * ($this->discount_percentage / 100);
+            $this->grand_total = $total - $this->total_discount;
+        });
     }
 
     public function mount()

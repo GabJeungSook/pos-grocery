@@ -15,6 +15,8 @@
             <th class="py-2 px-4 border-b border-black font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">Quantity</th>
             <th class="py-2 px-4 border-b border-black font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">Price</th>
             <th class="py-2 px-4 border-b border-black font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">Sub Total</th>
+            <th class="py-2 px-4 border-b border-black font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;"></th>
+
         </tr>
     </thead>
     <tbody>
@@ -29,6 +31,13 @@
                     </td>
                     <td class="py-2 px-4 border-r border-gray-400 text-center font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">₱ {{number_format($product['price'], 2)}}</td>
                     <td class="py-2 px-4 border-r border-gray-400 text-center font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">₱ {{number_format($product['price'] * $product['quantity'], 2)}}</td>
+                    <td class="py-2 px-4 border-r border-gray-400 text-right font-mono" style="border-right-style: solid; border-color: gray; border-width: 2px;">
+                        <div class="flex justify-between">
+                            {{ ($this->updateQuantityAction)(['id' => $product['id']]) }}
+                            {{ ($this->deleteRowAction)(['id' => $product['id']]) }}
+                        </div>
+                        <x-filament-actions::modals />
+                    </td>
                 </tr>
             @empty
                 <tr>
