@@ -16,10 +16,10 @@ class CashierOverview extends BaseWidget
             ->description('Number of products with available stocks')
             ->icon('heroicon-m-shopping-cart')
             ->color('primary'),
-            Stat::make('Sales Today', '₱ '.Transaction::whereDate('created_at', now())->sum('amount_paid'))
+            Stat::make('Sales Today', '₱ '.Transaction::whereDate('created_at', now())->where('is_voided', 0)->sum('grand_total'))
             ->icon('heroicon-m-currency-dollar')
             ->description('Total sales today'),
-            Stat::make('Overall Sales', '₱ '.Transaction::sum('amount_paid'))
+            Stat::make('Overall Sales', '₱ '.Transaction::where('is_voided', 0)->sum('grand_total'))
             ->icon('heroicon-m-currency-dollar')
             ->description('Total overall sales'),
         ];

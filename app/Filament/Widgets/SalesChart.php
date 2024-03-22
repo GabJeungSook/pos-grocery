@@ -14,13 +14,13 @@ class SalesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $data = Trend::model(Transaction::class)
+        $data = Trend::query(Transaction::query()->where('is_voided', 0))
         ->between(
             start: now()->startOfYear(),
             end: now()->endOfYear(),
         )
         ->perMonth()
-        ->sum('amount_paid');
+        ->sum('grand_total');
 
     return [
         'datasets' => [
