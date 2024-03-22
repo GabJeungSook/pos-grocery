@@ -2,16 +2,17 @@
 
 namespace App\Filament\Cashier\Resources;
 
-use App\Filament\Cashier\Resources\TransactionReportResource\Pages;
-use App\Filament\Cashier\Resources\TransactionReportResource\RelationManagers;
-use App\Models\Transaction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\Transaction;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Cashier\Resources\TransactionReportResource\Pages;
+use App\Filament\Cashier\Resources\TransactionReportResource\RelationManagers;
 
 class TransactionReportResource extends Resource
 {
@@ -28,7 +29,12 @@ class TransactionReportResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Select::make('is_voided')
+                ->label('Transaction Status')
+                ->options([
+                    'regular' => 'Regular',
+                    'voided' => 'Voided',
+                ])
             ]);
     }
 

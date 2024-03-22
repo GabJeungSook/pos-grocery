@@ -2,16 +2,17 @@
 
 namespace App\Filament\Cashier\Resources;
 
-use App\Filament\Cashier\Resources\TransactionResource\Pages;
-use App\Filament\Cashier\Resources\TransactionResource\RelationManagers;
-use App\Models\Transaction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\Transaction;
+use Filament\Resources\Resource;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Cashier\Resources\TransactionResource\Pages;
+use App\Filament\Cashier\Resources\TransactionResource\RelationManagers;
 
 class TransactionResource extends Resource
 {

@@ -156,6 +156,45 @@ class PointOfSale extends Page
                 ->success()
                 ->send();
             }),
+            Action::make('voidTransaction')
+            ->label('Void Transaction')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->disabled(fn () => $this->scanned_products === [])
+            ->action(function () {
+                DB::beginTransaction();
+                $transaction = Transaction::create([
+                    'transaction_number' => 'TRN-'.date('YmdHis'),
+                    'quantity' => $this->total_quantity,
+                    'sub_total' => $this->sub_total,
+                    'tax' => $this->total_tax,
+                    'discount' => $this->total_discount,
+                    'discount_type' => $this->discount_name,
+                    'grand_total' => $this->grand_total,
+                    'amount_paid' => null,
+                    'change' => null,
+                    'is_voided' => true,
+                ]);
+
+                foreach ($this->scanned_products as $key => $product) {
+                    $transaction->transaction_items()->create([
+                        'product_id' => $product['id'],
+                        'quantity' => $product['quantity'],
+                        'price' => $product['price'],
+                        'sub_total' => $product['subtotal'],
+                    ]);
+                }
+                DB::commit();
+                Notification::make()
+                ->title('Transaction Voided')
+                ->body('The transaction has been successfully voided.')
+                ->success()
+                ->send();
+                $this->scanned_products = [];
+                $this->total_quantity = 0;
+                $this->grand_total = 0;
+                $this->scan_barcode = null;
+            }),
             Action::make('cancel')
             ->label('Cancel')
             ->color('danger')

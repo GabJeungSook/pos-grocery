@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('grand_total', 8, 2);
             $table->decimal('amount_paid', 8, 2)->nullable();
             $table->decimal('change', 8, 2)->nullable();
+            $table->boolean('is_voided')->default(false);
             $table->timestamps();
         });
     }
