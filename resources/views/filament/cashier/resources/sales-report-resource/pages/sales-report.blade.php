@@ -21,14 +21,14 @@
                             <th class="border border-gray-500 px-2 py-2">Transaction No.</th>
                             <th class="border border-gray-500 px-2 py-2">Total Quantity</th>
                             <th class="border border-gray-500 px-2 py-2">Sub Total</th>
-                            <th class="border border-gray-500 px-2 py-2">Grand Total</th>
                             <th class="border border-gray-500 px-2 py-2">Amount Paid</th>
+                            <th class="border border-gray-500 px-2 py-2">Grand Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Sample Data (Replace this with your actual data) -->
 
-                        @foreach ($record as $item)
+                        @foreach ($record->where('is_voided', 0) as $item)
                         <tr>
                             <td class="border border-gray-500 px-2 py-2">{{Carbon\Carbon::parse($item->created_at)->format('M d, Y')}}</td>
                             <td class="border border-gray-500 px-2 py-2">{{strtoupper($item->transaction_number)}}</td>
@@ -43,7 +43,7 @@
                 </table>
 
                 <div class="flex justify-end font-semibold text-lg" style="margin-right: 3.5rem; margin-top: 2rem;">
-                    <p>Total Sales Today : ₱ {{number_format($record->sum('amount_paid'), 2)}}</p>
+                    <p>Total Sales Today : ₱ {{number_format($record->where('is_voided', 0)->sum('grand_total'), 2)}}</p>
                 </div>
 
                 <div class="flex justify-between" style="margin-top: 35px;">
